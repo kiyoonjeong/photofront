@@ -1,36 +1,28 @@
-## Amazon Transcribe Websocket Static
+# Photo Album Web Application
 
-[Try it out](https://transcribe-websockets.go-aws.com/)
+Build a photo album web application that can be searched using natural language through both text and voice.
 
-A static site demonstrating real-time audio transcription via Amazon Transcribe over a WebSocket.
+### Outline:
 
-This demo app uses browser microphone input and client-side JavaScript to demonstrate the real-time streaming audio transcription capability of [Amazon Transcribe](https://aws.amazon.com/transcribe/) using WebSockets.
+1. Security Group is used to prevent unauthorized interent access.
+2. S3 bucket is used to store the photos. Whenever the users upload the photos, it triggers the lambda function that detect labels in the image using Rekognition service. Then, it stores this information in the ElasticSearch.
+3. If the user search photos, it triggers lambda function that sends the search query to Amazon Lex bot to catch the intent and extract the keywords. Then, it searches the best fit photos using the ElasticSearch, and return the photos accordingly.
+4. User can also use voice rather than text to perform the search. Amazon Transcribe service is used.
+5. CloudFormation and CodePipeline is created to build and deploy above services.
 
-Check out the [Amazon Transcribe WebSocket docs](https://docs.aws.amazon.com/transcribe/latest/dg/websocket.html).
+### Workflow
 
-## Building and Deploying
+1. User search photo via text or voice.
+2. Step 1 invokes lambda function that detect search keywords via Amazon Lex service, get the best fit photo id via elastic search, and finally get the best fit photos in S3 bucket.
+3. User upload photo. It would upload photo into the S3 bucket.
+4. The S3 bucket triggers lambda function when the image is uploaded. It identify the objects in photos by using AWS Rekognition service, and store these information in ElasticSearch.
 
-[![amplifybutton](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/aws-samples/amazon-transcribe-websocket-static)
 
-Even though this is a static site consisting only of HTML, CSS, and client-side JavaScript, there is a build step required. Some of the modules used were originally made for server-side code and do not work natively in the browser.
+### CloudFormation
 
-We use [browserify](https://github.com/browserify/browserify) to enable browser support for the JavaScript modules we `require()`.
+Using the CloudFormation Template, you can stand up the entire functional stack for this service.
+Once a new commit is pushed, the CodePipeline automatically build and deploy the code to the corresponding AWS infrastructure.
 
-1. Clone the repo
-2. run `npm install`
-3. run `npm run-script build` to generate `dist/main.js`.
+### Architecture Image
 
-Once you've bundled the JavaScript, all you need is a webserver. For example, from your project directory: 
-
-```
-npm install --global local-web-server
-ws
-```
-
-### Credits
-
-This project is based on code written by Karan Grover from the Amazon Transcribe team, who did the hard work (audio encoding, event stream marshalling).
-
-## License
-
-This library is licensed under the Apache 2.0 License. 
+![Screenshot](Architecture.png)
